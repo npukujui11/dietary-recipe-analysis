@@ -1,0 +1,288 @@
+% 初始化存储每100g营养成分的结构体
+nutrient_content_per_100g_woman = struct();
+
+% 遍历每一行并提取营养成分
+for i = 1:height(nutrition_composition_woman)
+    food_name = nutrition_composition_woman.food_name{i};
+    nutrient_content_per_100g_woman.(food_name) = struct( ...
+        'Carbohydrates', nutrition_composition_woman.Carbohydrates_g_100g(i), ...
+        'Protein', nutrition_composition_woman.Protein_g_100g(i), ...
+        'Fat', nutrition_composition_woman.Fat_g_100g(i), ...
+        'Calcium', nutrition_composition_woman.Calcium_mg_100g(i), ...
+        'Iron', nutrition_composition_woman.Iron_mg_100g(i), ...
+        'Zinc', nutrition_composition_woman.Zinc_mg_100g(i), ...
+        'VitaminA', nutrition_composition_woman.VitaminA_mcg_100g(i), ...
+        'VitaminB1', nutrition_composition_woman.VitaminB1_mg_100g(i), ...
+        'VitaminB2', nutrition_composition_woman.VitaminB2_mg_100g(i), ...
+        'VitaminC', nutrition_composition_woman.VitaminC_mg_100g(i), ...
+        'Isoleucine', nutrition_composition_woman.Isoleucine_g_100g(i), ...
+        'Leucine', nutrition_composition_woman.Leucine_g_100g(i), ...
+        'Lysine', nutrition_composition_woman.Lysine_g_100g(i), ...
+        'SulfurAminoAcids', nutrition_composition_woman.SulfurAminoAcids_g_100g(i), ...
+        'AromaticAminoAcids', nutrition_composition_woman.AromaticAminoAcids_g_100g(i), ...
+        'Threonine', nutrition_composition_woman.Threonine_g_100g(i), ...
+        'Tryptophan', nutrition_composition_woman.Tryptophan_g_100g(i), ...
+        'Valine', nutrition_composition_woman.Valine_g_100g(i) ...
+    );
+end
+
+% Recipe
+recipe = struct( ...
+    'Breakfast', struct( ...
+        'Soy_Milk_Soybean', [10, 1], ...
+        'Chicken_Noodle_Wheat_Flour', [50, 1], ...
+        'Chicken_Noodle_Chicken_Meat', [40, 1], ...
+        'Chicken_Noodle_Soybean_Oil', [5, 1] ...
+    ), ...
+    'Lunch', struct( ...
+        'Egg_Cake_Wheat_Flour', [25, 1], ...
+        'Egg_Cake_Egg', [20, 1], ...
+        'Egg_Cake_Sausage', [20, 1], ...
+        'Egg_Cake_Soybean_Oil', [5, 1], ...
+        'Dumpling_Wheat_Flour', [50, 1], ...
+        'Dumpling_Pork', [20, 1], ...
+        'Dumpling_Cabbage', [40, 1], ...
+        'Dumpling_Soybean_Oil', [10, 1], ...
+        'Grape', [100, 1] ...
+    ), ...
+    'Dinner', struct( ...
+        'Rice_Rice', [25 * 2, 2], ...
+        'Stir_fried_Kale_Kale', [100, 0.5], ...
+        'Stir_fried_Kale_Mushroom', [20, 0.5], ...
+        'Stir_fried_Kale_Soybean_Oil', [5, 0.5], ...
+        'Stir_fried_Meat_with_Garlic_Stir_fried_Garlic', [100, 0.5], ...
+        'Stir_fried_Meat_with_Garlic_Pork', [30, 0.5], ...
+        'Stir_fried_Meat_with_Garlic_Soybean_Oil', [5, 0.5], ...
+        'Sardine_in_Tomato_Sauce', [100, 0.5], ...
+        'Apple', [100, 1] ... 
+    ) ...
+);
+
+% 计算每日食物种类数量
+total_food_types = 0;
+meal_names = fieldnames(recipe);
+for i = 1:numel(meal_names)
+    total_food_types = total_food_types + numel(fieldnames(recipe.(meal_names{i})));
+end
+
+average_food_types_per_day = total_food_types / numel(meal_names);
+
+if average_food_types_per_day > 12
+    disp('平均每天摄入食物种类数量大于12种');
+else
+    disp('平均每天摄入食物种类数量不足12种');
+end
+
+% 计算总能量
+total_energy = 0;
+for i = 1:numel(meal_names)
+    foods = recipe.(meal_names{i});
+    food_names = fieldnames(foods);
+    for j = 1:numel(food_names)
+        food = food_names{j};
+        amount = foods.(food)(1);
+        servings = foods.(food)(2);
+        total_energy = total_energy + sum([ ...
+            nutrient_content_per_100g_woman.(food).Protein, ...
+            nutrient_content_per_100g_woman.(food).Fat, ...
+            nutrient_content_per_100g_woman.(food).Carbohydrates ...
+        ] .* amount * servings / 100);
+    end
+end
+
+% 计算早餐、午餐和晚餐的能量
+energy_breakfast = 0;
+foods = recipe.Breakfast;
+food_names = fieldnames(foods);
+for j = 1:numel(food_names)
+    food = food_names{j};
+    amount = foods.(food)(1);
+    servings = foods.(food)(2);
+    energy_breakfast = energy_breakfast + sum([ ...
+        nutrient_content_per_100g_woman.(food).Protein, ...
+        nutrient_content_per_100g_woman.(food).Fat, ...
+        nutrient_content_per_100g_woman.(food).Carbohydrates ...
+    ] .* amount * servings / 100);
+end
+
+energy_lunch = 0;
+foods = recipe.Lunch;
+food_names = fieldnames(foods);
+for j = 1:numel(food_names)
+    food = food_names{j};
+    amount = foods.(food)(1);
+    servings = foods.(food)(2);
+    energy_lunch = energy_lunch + sum([ ...
+        nutrient_content_per_100g_woman.(food).Protein, ...
+        nutrient_content_per_100g_woman.(food).Fat, ...
+        nutrient_content_per_100g_woman.(food).Carbohydrates ...
+    ] .* amount * servings / 100);
+end
+
+energy_dinner = 0;
+foods = recipe.Dinner;
+food_names = fieldnames(foods);
+for j = 1:numel(food_names)
+    food = food_names{j};
+    amount = foods.(food)(1);
+    servings = foods.(food)(2);
+    energy_dinner = energy_dinner + sum([ ...
+        nutrient_content_per_100g_woman.(food).Protein, ...
+        nutrient_content_per_100g_woman.(food).Fat, ...
+        nutrient_content_per_100g_woman.(food).Carbohydrates ...
+    ] .* amount * servings / 100);
+end
+
+% 计算能量占比
+percent_breakfast = (energy_breakfast / total_energy) * 100;
+percent_lunch = (energy_lunch / total_energy) * 100;
+percent_dinner = (energy_dinner / total_energy) * 100;
+
+fprintf('早餐能量占比：%.2f%%\n', percent_breakfast);
+fprintf('午餐能量占比：%.2f%%\n', percent_lunch);
+fprintf('晚餐能量占比：%.2f%%\n', percent_dinner);
+
+% 能量参考值
+reference_percent_breakfast = [30, 30];
+reference_percent_lunch = [30, 40];
+reference_percent_dinner = [30, 40];
+
+% 判断能量占比是否符合参考值
+if percent_breakfast < reference_percent_breakfast(1)
+    disp('早餐能量占比低于参考值');
+elseif percent_breakfast > reference_percent_breakfast(2)
+    disp('早餐能量占比高于参考值');
+else
+    disp('早餐能量占比符合参考值');
+end
+
+if percent_lunch < reference_percent_lunch(1)
+    disp('午餐能量占比低于参考值');
+elseif percent_lunch > reference_percent_lunch(2)
+    disp('午餐能量占比高于参考值');
+else
+    disp('午餐能量占比符合参考值');
+end
+
+if percent_dinner < reference_percent_dinner(1)
+    disp('晚餐能量占比低于参考值');
+elseif percent_dinner > reference_percent_dinner(2)
+    disp('晚餐能量占比高于参考值');
+else
+    disp('晚餐能量占比符合参考值');
+end
+
+
+% Initialize nutrient intake variables
+carbs_intake = 0;
+protein_intake = 0;
+fat_intake = 0;
+
+% Calculate nutrient intakes
+meals = fieldnames(recipe);
+for m = 1:numel(meals)
+    foods = recipe.(meals{m});
+    food_names = fieldnames(foods);
+    for f = 1:numel(food_names)
+        food = food_names{f};
+        amount = foods.(food)(1);
+        servings = foods.(food)(2);
+        if isfield(nutrient_content_per_100g, food)
+            carbs_intake = carbs_intake + nutrient_content_per_100g.(food).Carbohydrates * amount * servings / 100;
+            protein_intake = protein_intake + nutrient_content_per_100g.(food).Protein * amount * servings / 100;
+            fat_intake = fat_intake + nutrient_content_per_100g.(food).Fat * amount * servings / 100;
+        end
+    end
+end
+
+% Daily energy requirement
+daily_energy_requirement = 2400;
+
+% Calculate nutrient percentages
+protein_percent = (protein_intake * 4 / daily_energy_requirement) * 100;
+fat_percent = (fat_intake * 9 / daily_energy_requirement) * 100;
+carbs_percent = (carbs_intake * 4 / daily_energy_requirement) * 100;
+
+% Print nutrient intake and percentages
+fprintf('每日摄入的蛋白质量: %.2f克\n', protein_intake);
+fprintf('每日摄入的脂肪量: %.2f克\n', fat_intake);
+fprintf('每日摄入的碳水化合物量: %.2f克\n', carbs_intake);
+fprintf('蛋白质占总能量的百分比: %.2f%%\n', protein_percent);
+fprintf('脂肪占总能量的百分比: %.2f%%\n', fat_percent);
+fprintf('碳水化合物占总能量的百分比: %.2f%%\n', carbs_percent);
+
+% Reference values
+reference_protein_percent = [10, 15];
+reference_fat_percent = [20, 30];
+reference_carbs_percent = [50, 65];
+
+% Check nutrient intake against reference values
+if protein_percent < reference_protein_percent(1)
+    disp('蛋白质摄入量低于参考值');
+elseif protein_percent > reference_protein_percent(2)
+    disp('蛋白质摄入量高于参考值');
+else
+    disp('蛋白质摄入量符合参考值');
+end
+
+if fat_percent < reference_fat_percent(1)
+    disp('脂肪摄入量低于参考值');
+elseif fat_percent > reference_fat_percent(2)
+    disp('脂肪摄入量高于参考值');
+else
+    disp('脂肪摄入量符合参考值');
+end
+
+if carbs_percent < reference_carbs_percent(1)
+    disp('碳水化合物摄入量低于参考值');
+elseif carbs_percent > reference_carbs_percent(2)
+    disp('碳水化合物摄入量高于参考值');
+else
+    disp('碳水化合物摄入量符合参考值');
+end
+
+% Amino acid reference values
+reference_amino_acids = struct( ...
+    'Isoleucine', 40, ...
+    'Leucine', 70, ...
+    'Lysine', 55, ...
+    'SulfurAminoAcids', 35, ...
+    'AromaticAminoAcids', 60, ...
+    'Threonine', 40, ...
+    'Tryptophan', 10, ...
+    'Valine', 50 ...
+);
+
+% Calculate total amino acid scores
+total_protein = 0;
+total_amino_acid_scores = struct();
+
+for m = 1:numel(meals)
+    foods = recipe.(meals{m});
+    food_names = fieldnames(foods);
+    for f = 1:numel(food_names)
+        food = food_names{f};
+        amount = foods.(food)(1);
+        servings = foods.(food)(2);
+        if isfield(nutrient_content_per_100g, food)
+            total_protein = total_protein + nutrient_content_per_100g.(food).Protein * (amount / 100) * servings;
+            amino_acid_names = fieldnames(reference_amino_acids);
+            for a = 1:numel(amino_acid_names)
+                amino_acid = amino_acid_names{a};
+                if isfield(nutrient_content_per_100g.(food), amino_acid)
+                    amino_acid_content = nutrient_content_per_100g.(food).(amino_acid);
+                    score = min((amino_acid_content / reference_amino_acids.(amino_acid)), 1);
+                    if isfield(total_amino_acid_scores, amino_acid)
+                        total_amino_acid_scores.(amino_acid) = total_amino_acid_scores.(amino_acid) + score * (amount / 100) * servings;
+                    else
+                        total_amino_acid_scores.(amino_acid) = score * (amount / 100) * servings;
+                    end
+                end
+            end
+        end
+    end
+end
+
+total_aas_score = sum(cell2mat(struct2cell(total_amino_acid_scores))) / numel(fieldnames(reference_amino_acids));
+
+fprintf('总氨基酸评分: %.2f\n', total_aas_score);
